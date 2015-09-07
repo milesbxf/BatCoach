@@ -1,0 +1,6 @@
+[global]
+server.socket_port: 9090
+
+[/static]
+tools.staticdir.on = True
+tools.staticdir.dir = "/"

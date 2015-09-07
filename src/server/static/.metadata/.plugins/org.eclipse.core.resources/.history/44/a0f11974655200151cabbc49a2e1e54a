@@ -1,0 +1,12 @@
+[global]
+server.socket_port: 9090
+
+tree.server: cherrypy.Application(server.Root())
+
+[/]
+tools.staticdir.root = server.current_dir + "/../app"
+
+[/static]
+tools.staticdir.on = True
+tools.staticdir.dir = "static"
+tools.staticdir.index = "index.html"

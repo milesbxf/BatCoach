@@ -1,0 +1,13 @@
+import cherrypy,os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+class Root(object):
+    @cherrypy.expose
+    def index(self):
+        return "Hello world!"
+
+if __name__ == '__main__':
+    cherrypy.tree.mount(HelloWorld(),'/hello', config = "server.conf")
+    cherrypy.engine.start()
+    cherrypy.engine.block()

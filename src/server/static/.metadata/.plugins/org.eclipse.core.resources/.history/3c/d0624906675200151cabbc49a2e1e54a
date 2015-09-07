@@ -1,0 +1,10 @@
+[global]
+server.socket_port: 9090
+tools.staticdir.debug = True
+log.screen = True
+
+[/app]
+tools.staticdir.root = "/home/miles/workspace/web/batcoach/"
+tools.staticdir.on = True
+tools.staticdir.dir = "app"
+tools.staticdir.index = "app/index.html"
