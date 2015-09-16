@@ -2,7 +2,7 @@
 <html class="no-js">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>BatCoach</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -54,7 +54,7 @@
                         <li role="presentation"><a href="#/import">Import all</a></li>
                         <li role="separator" class="divider"></li>
                         <li role="presentation"><a href="#/import">Choose files</a></li>
-                        <li role="presentation"><a href="#/import">Settings</a></li>
+                        <li role="presentation"><a href="#/import/choosedir">Choose import folder</a></li>
                     </ul>
                 </li>
             </ul>
@@ -96,6 +96,8 @@
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
     <script src="bower_components/angular-touch/angular-touch.js"></script>
+    <script src="bower_components/ng-file-upload/ng-file-upload.js"></script>
+    <script src="bower_components/ng-file-upload/ng-file-upload-shim.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -105,6 +107,10 @@
         <script src="scripts/controllers/squad.js"></script>
         <script src="scripts/controllers/import.js"></script>
         <script src="scripts/controllers/matches.js"></script>
+        <script src="scripts/controllers/choosedir.js"></script>
+        <script src="scripts/controllers/setup.js"></script>
+        
+        <script src="scripts/services/importdir.js"></script>
         <!-- endbuild -->
 </body>
 </html>
