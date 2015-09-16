@@ -1,0 +1,41 @@
+<div class="panel panel-default" ng-init="init()">
+	<div class="panel-heading">
+		<h2 class="panel-title">{{directory}}</h2>
+
+	</div>
+
+
+	<div class="panel-body container-fluid">
+		<div class="row" style="padding-top: 6px;">
+			<div class="form-group">
+				<div class="col-md-10">
+					<input type="text" ng-submit="getFiles(directory)"
+						ng-model="directory" class="form-control input-sm" id="dir">
+				</div>
+			</div>
+
+		</div>
+		<div class="row" style="padding-top: 6px;"></div>
+
+
+		<div class="row" style="padding-top: 6px;">
+			<a href="" ng-click="getParent()">Up one level...</a>
+		</div>
+
+		<div class="row-fluid" ng-repeat="folder in folders">
+			<div class="col-md-4">
+				<label> <a href="" ng-click="getFiles(folder)">{{folder}}</a>
+				</label>
+			</div>
+		</div>
+
+		<div class="row" style="padding-top: 6px;"></div>
+
+		<div class="row panel-body pull-right" style="padding-top: 6px;">
+			<a href=""
+				ng-click="changeImportDir(directory).then(redirectToImport());">Change
+				import directory and go to import...</a>
+		</div>
+	</div>
+
+</div>
