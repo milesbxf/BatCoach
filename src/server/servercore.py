@@ -17,18 +17,25 @@ from core.PyBatBase import HTMLFile
 
 
 class Config(object):
-    """    The Config service (at /api/config/) allows the front end to check whether a database has been initialised.   """
+    """
+    The Config service (at /api/config/) allows the front end to check
+    whether a database has been initialised.
+    """
 
     def __init__(self, model):
         self.model = model
 
     @cherrypy.expose
     def checkdbinit(self):
+        """   Checks whether any teams are in the database.   """
         return {'db_initialised': self.model.has_teams()}
 
 
 class Players(object):
-    """    The Players service (at /api/players/) provides access to the squad of players in the database.    """
+    """
+    The Players service (at /api/players/) provides access to the squad of
+    players in the database.
+    """
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def index(self):
@@ -67,6 +74,10 @@ class Import(object):
     """
 
     def __init__(self, model):
+        """
+        Initialises the Import service, setting the default import directory to
+         the user's home directory.
+        """
         # load the user's home directory by default
         # TODO: check this works on Windows?
         self.import_dir = os.path.expanduser('~/')
@@ -91,6 +102,7 @@ class Import(object):
         Returns the currently set import directory,
         which will be an absolute path. If the directory is
         not valid or does not exist, a HTTP 500 status is given.
+        Returns a JSON string with {curDir: <directory>}.
         """
         self.__check_import_dir__()
         return {'curDir': self.import_dir}
@@ -101,7 +113,7 @@ class Import(object):
         """
         Lists the HTML files in the currently set import directory.
         If directory is not valid or does not exist, a HTTP 500 status
-        is given.
+        is given. Returns a JSON object with {files: [list of files]}
         """
         self.__check_import_dir__()
 
@@ -113,13 +125,15 @@ class Import(object):
     @cherrypy.tools.json_out()
     @cherrypy.expose
     def importfiles(self):
-        """ Imports the files provided as a list of local filenames in the request. """
+        """
+        Imports the files provided as a list of local filenames in the request.
+        """
         files = (cherrypy.request.json['files'])
 
         html_files = []
-        for f in files:
+        for filename in files:
             # generate HTMLFile objects from the filenames
-            html_files.append(HTMLFile.from_file(f))
+            html_files.append(HTMLFile.from_file(filename))
 
         self.model.import_multiple_files(html_files)
 
@@ -140,13 +154,21 @@ class Import(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     def changedir(self):
+        """
+        Changes the import directory to that given in the JSON request
+        {newdir: <directory>}. It checks whether the path exists and returns a
+        HTTP 400 error if not.
+        """
         folder = cherrypy.request.json['newdir']
+
+        # clean the given directory name in case it is URI encoded
         folder = unquote(folder)
 
-        if(not folder.endswith('/')):
-            folder += '/'
+        # ensure all paths end with a path separator to maintain consistency
+        if not folder.endswith(os.pathsep):
+            folder += os.pathsep
 
-        if(not os.path.exists(folder)):
+        if not os.path.exists(folder):
             raise cherrypy.HTTPError(
                 400, 'Selected folder %s does not exist' % folder)
 
@@ -154,6 +176,9 @@ class Import(object):
 
     @cherrypy.expose
     def upload(self, file, data):
+        """
+        Directly upload a HTML file.
+        """
         out = """<html>
         <body>
             myFile length: %s<br />
@@ -161,6 +186,8 @@ class Import(object):
             myFile mime-type: %s
         </body>
         </html>"""
+
+        # TODO fully implement
 
         # Although this just counts the file length, it demonstrates
         # how to read large files in chunks instead of all at once.
@@ -188,14 +215,22 @@ class FolderBrowser(object):
     def list(self):
         """
         Lists the folders in the given directory. If the directory
-        given doesn't exist, a HTTP 400 status is given.
+        given doesn't exist, a HTTP 400 status is given. The JSON request
+        should be in the form {path: <full path>, subdir: <new subdirectory>}.
+        'subdir' is optional; if given, the path and subdir will be concatenated.
         """
         req = cherrypy.request.json
-        print(req)
         newdir = ''
-        path = ''
+
+        # check that params are given
         if('path' not in req):
             raise cherrypy.HTTPError(400, "Directory not given")
+
+        # three possibilities:
+        #    only path given, newdir = path
+        #    path + subdir given, newdir = path + subdir
+        #    subdir is .., newdir = parent of path
+
         elif 'subdir' in req:
             if(req['subdir'] == '..'):
                 # get parent directory
@@ -208,6 +243,8 @@ class FolderBrowser(object):
             # get all subdirectories
             folders = [o for o in os.listdir(newdir)
                        if os.path.isdir(os.path.join(newdir, o))]
+
+            # sort by name
             folders = sorted(folders)
         except FileNotFoundError:
             raise cherrypy.HTTPError(

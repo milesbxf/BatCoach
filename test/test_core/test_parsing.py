@@ -25,6 +25,7 @@ def test_parse_team_id_parses_id():
     teamID = parse_team_id(html)
     assert_equal(teamID, 30438)
 
+
 class TestParsingPlayer():
     """
     Tests for parsing player attributes and information from a HTML file.

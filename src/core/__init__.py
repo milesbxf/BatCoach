@@ -1,4 +1,4 @@
 from sqlalchemy.ext.declarative import declarative_base
-import sys
 
+# initialises the database metadata
 Base = declarative_base()
