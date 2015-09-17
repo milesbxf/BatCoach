@@ -7,6 +7,8 @@ from core import Base
 from pyquery import PyQuery as pq
 from datetime import datetime
 import os
+import cherrypy
+
 
 class PageParseException(Exception):
     pass
@@ -75,6 +77,9 @@ class Team(Base):
     rankings = relationship(
         "RankingSnapshot", order_by="RankingSnapshot.date", backref="team")
 
+    def add_ranking(self, ranking):
+        self.rankings.append(ranking)
+
 
 class HTMLFile(Base):
 
@@ -82,22 +87,21 @@ class HTMLFile(Base):
     def from_file(cls, filename):
         ''' Constructs a HTMLFile from a file in memory with specified modified time '''
 
-
         try:
             # open the file and read into a PyQuery Document
             f = open(filename, 'r')
             file_contents = f.read()
             mtime = datetime.fromtimestamp(os.path.getmtime(filename))
-            
-            htmlFile = cls.from_memory(file_contents,mtime)
+
+            htmlFile = cls.from_memory(file_contents, mtime)
         finally:
             f.close()
 
         return htmlFile
 
     @classmethod
-    def from_memory(cls,file_contents,modified_time):
-        
+    def from_memory(cls, file_contents, modified_time):
+
         htmlFile = cls()
 
         doc = pq(file_contents)

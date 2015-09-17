@@ -13,6 +13,6 @@ def test_config_check_returns_false_if_not_db_init():
     
     config = Config(mock_model)
     
-    result = config.checkdbinit()
+    result = config.dbinit()
     
-    assert_equal(result, {'db_initialised':False})
+    assert_equal(result, {'dbInit':False})

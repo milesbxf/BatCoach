@@ -7,7 +7,7 @@
  */
 
 (function(module) {
-	var ImportCtrl = function($scope, $http, ImportDirService) {
+	var ImportCtrl = function($scope, $http, GlobalsService) {
 
 		$scope.directory = '';
 
@@ -54,14 +54,14 @@
 		};
 
 		$scope.init = function() {
-			ImportDirService.getImportDir().then(function(result) {
+			GlobalsService.getImportDir().then(function(result) {
 				$scope.directory = result.data.curDir;
 			});
 			$scope.getFiles();
 		};
 
 	};
-	module.controller('ImportCtrl', [ '$scope', '$http', 'ImportDirService',
+	module.controller('ImportCtrl', [ '$scope', '$http', 'GlobalsService',
 			ImportCtrl ]);
 
 })(angular.module('batcoachApp'));

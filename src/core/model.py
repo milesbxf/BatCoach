@@ -10,6 +10,7 @@ from core.PyBatBase import PageTypes, Team
 from core.parsing import (parse_players,
                           parse_pavilion, parse_team_id)
 from contextlib import contextmanager
+import cherrypy
 
 
 class BatDatabaseError(Exception):
@@ -56,35 +57,49 @@ class Model():
         finally:
             session.close()
 
-    def import_file(self, html_file, session):
+    def import_file(self, html_file):
         """
-        Imports a single HTMLFile into the database, parsing as appropriate. 
+        Imports a single HTMLFile into the database, parsing as appropriate.
         The team is created if it doesn't already exist
         """
         team = None
 
-        # find team in the database
-        team_id = parse_team_id(html_file.HTML)
-        result = session.query(Team).filter_by(id=team_id)
+        with self.session_scope() as session:
+            # find team in the database
+            team_id = parse_team_id(html_file.HTML)
+            result = session.query(Team).filter_by(id=team_id)
 
-        if(result.count()):
-            team = result.first()
-        else:  # no team, so create it
-            team = Team()
-            team.id = team_id
+            if(result.count()):
+                team = result.first()
+            else:  # no team, so create it
+                team = Team()
+                team.id = team_id
 
-        # pass the html to the appropriate parsing function
-        if(html_file.type == PageTypes.Pavilion.value):
-            team.rankings.append(parse_pavilion(html_file.HTML))
-        elif(html_file.type == PageTypes.Squad.value):
-            team.players = parse_players(html_file.HTML)
+            # pass the html to the appropriate parsing function
+            if(html_file.type == PageTypes.Pavilion.value):
+                team.add_ranking(parse_pavilion(html_file.HTML))
+            elif(html_file.type == PageTypes.Squad.value):
+                team.players = parse_players(html_file.HTML)
 
-        # add the team and HTML file to the database
-        session.add(team)
-        session.add(html_file)
-        session.flush()
+            # add the team and HTML file to the database
+            session.add(team)
+            session.add(html_file)
+            session.flush()
 
         return html_file
+
+    def get_team(self, session=None):
+        if session is None:
+            with self.session_scope() as new_session:
+                return self.get_team(new_session)
+        return session.query(Team).first()
+
+    def get_players(self, session=None):
+        if session is None:
+            with self.session_scope() as new_session:
+                return self.get_players(new_session)
+        team = self.get_team(session)
+        return team.players
 
     def has_teams(self):
         """

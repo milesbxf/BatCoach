@@ -1,12 +1,12 @@
 from server.servercore import Import
 import unittest.mock as mock
 import cherrypy
-from nose.tools import raises
+from nose.tools import raises, assert_true
 from unittest.mock import patch, call
 from unittest.case import TestCase
 from core.model import Model
 from core.PyBatBase import HTMLFile
-
+from datetime import datetime
 
 
 class ModelMock(Model):
@@ -84,30 +84,15 @@ class TestImport(TestCase):
         self.import_ctrl.listfiles()
 
     @mock.patch('core.PyBatBase.HTMLFile.from_file')
-    def test_import_files(self,mock_from_file):
+    def test_import_files(self, mock_from_file):
 
         mock_from_file.return_value = HTMLFile()
-        
+
         cherrypy.request.json = {
             'files': ['file1.html', 'file2.html', 'file3.html']}
         result = self.import_ctrl.importfiles()
 
         assert result
-
-    @mock.patch('core.PyBatBase.HTMLFile.from_file')
-    def test_import_multiple_files_imports_files(self,mock_from_file):
-        self.mock_model.import_multiple_files = mock.Mock()
-
-        mock_from_file.return_value = HTMLFile()
-
-        cherrypy.request.json = {
-            'files': ['file1.html', 'file2.html', 'file3.html']}
-        self.import_ctrl.importfiles()
-
-        assert self.mock_model.import_multiple_files.called
-
-        mock_from_file.assert_has_calls(
-            [call('file1.html'), call('file2.html'), call('file3.html')])
 
     @raises(cherrypy.HTTPError)
     @mock.patch('os.path.exists')
@@ -117,3 +102,19 @@ class TestImport(TestCase):
         self.import_ctrl.changedir()
 
         assert mock_exists.called
+
+    @mock.patch('core.PyBatBase.HTMLFile.from_memory')
+    def test_uploads_and_formats_date(self, mock_from_memory):
+        # tests the upload single file function with an unformatted date
+        date = "2015-06-18T15:49:20.267Z"
+
+        file = mock.Mock()
+
+        self.import_ctrl.upload(file, date)
+
+        actual_date = datetime.strptime(
+            date[:date.index('.')], self.import_ctrl.date_format)
+
+        print(actual_date)
+
+        assert_true(actual_date == mock_from_memory.call_args_list[0][0][1])

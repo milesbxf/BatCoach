@@ -1,18 +1,18 @@
 'use strict';
 
-describe('Service: ImportDirService', function() {
+describe('Service: GlobalsService', function() {
 
 	// load the service's module
 	beforeEach(module('batcoachApp'));
 
-	var ImportDirService, dirnameRequestHandler;
+	var GlobalsService, dirnameRequestHandler, dbinitRequestHandler;
 	var $httpBackend;
 	var currentdir = '~/testdir/';
 
 	// Initialize the service and a mock scope
 	beforeEach(inject(function($injector) {
 
-		ImportDirService = $injector.get('ImportDirService');
+		GlobalsService = $injector.get('GlobalsService');
 
 		// initialise the mock HTTP backend
 		$httpBackend = $injector.get('$httpBackend');
@@ -22,6 +22,11 @@ describe('Service: ImportDirService', function() {
 					curDir : currentdir
 				});
 
+		dbinitRequestHandler = $httpBackend.when('GET', '/api/config/dbinit')
+				.respond({
+					dbInit: true
+				});
+		
 	}));
 
 	beforeEach(inject(function() {
@@ -36,12 +41,26 @@ describe('Service: ImportDirService', function() {
 		var result;
 		$httpBackend.expectGET('/api/import/dirname');
 
-		ImportDirService.getImportDir().then(function(response) {
+		GlobalsService.getImportDir().then(function(response) {
 			result = response.data.curDir;
 		});
 		
 		$httpBackend.flush();
 		expect(result).toBe(currentdir);
+	});
+	
+	it('should check if the database is setup', function() {
+
+		var result;
+		$httpBackend.expectGET('/api/config/dbinit');
+		
+		GlobalsService.getDBInit().then(function(response) {
+			result = response.data.dbInit;
+		});
+
+		$httpBackend.flush();
+		expect(result).toBe(true);
+		
 	});
 
 });

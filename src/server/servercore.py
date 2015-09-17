@@ -14,6 +14,7 @@ import glob
 from core.model import Model
 from urllib.parse import unquote
 from core.PyBatBase import HTMLFile
+from datetime import datetime
 
 
 class Config(object):
@@ -26,12 +27,17 @@ class Config(object):
         self.model = model
 
     @cherrypy.expose
-    def checkdbinit(self):
+    @cherrypy.tools.json_out()
+    def dbinit(self):
         """   Checks whether any teams are in the database.   """
-        return {'db_initialised': self.model.has_teams()}
+        return {'dbInit': self.model.has_teams()}
 
 
 class Players(object):
+    
+    def __init__(self,model):
+        self.model = model
+    
     """
     The Players service (at /api/players/) provides access to the squad of
     players in the database.
@@ -42,29 +48,32 @@ class Players(object):
         """
         Index (accessed at /api/players/). Currently a stub.
         """
+        
+        return model.get_players()
+        
         # TODO implement Players.index
-        return [
-            {
-                'firstName': 'John',
-                'surName': 'Smith',
-                'age': 18,
-                'BTR': 3000,
-                'wage': 812,
-                'batAggression': '4',
-                'batHand': 'R',
-                'bowlAggression': '3',
-                'bowlHand': 'R',
-                'bowlType': 'M',
-                'batForm': 9,
-                'bowlForm': 7,
-                'stamina': 3,
-                'keeping': 4,
-                'batting': 6,
-                'concentration': 4,
-                'bowling': 7,
-                'consistency': 6,
-                'fielding': 4}
-        ] * 10
+#         return [
+#             {
+#                 'firstName': 'John',
+#                 'surName': 'Smith',
+#                 'age': 18,
+#                 'BTR': 3000,
+#                 'wage': 812,
+#                 'batAggression': '4',
+#                 'batHand': 'R',
+#                 'bowlAggression': '3',
+#                 'bowlHand': 'R',
+#                 'bowlType': 'M',
+#                 'batForm': 9,
+#                 'bowlForm': 7,
+#                 'stamina': 3,
+#                 'keeping': 4,
+#                 'batting': 6,
+#                 'concentration': 4,
+#                 'bowling': 7,
+#                 'consistency': 6,
+#                 'fielding': 4}
+#         ] * 10
 
 
 class Import(object):
@@ -82,6 +91,7 @@ class Import(object):
         # TODO: check this works on Windows?
         self.import_dir = os.path.expanduser('~/')
         self.model = model
+        self.date_format = "%Y-%m-%dT%H:%M:%S"
 
     def __check_import_dir__(self):
         """
@@ -130,12 +140,9 @@ class Import(object):
         """
         files = (cherrypy.request.json['files'])
 
-        html_files = []
         for filename in files:
             # generate HTMLFile objects from the filenames
-            html_files.append(HTMLFile.from_file(filename))
-
-        self.model.import_multiple_files(html_files)
+            self.model.import_file(HTMLFile.from_file(filename))
 
         # TODO: add response with import success/failure
         return "true"
@@ -179,28 +186,16 @@ class Import(object):
         """
         Directly upload a HTML file.
         """
-        out = """<html>
-        <body>
-            myFile length: %s<br />
-            myFile filename: %s<br />
-            myFile mime-type: %s
-        </body>
-        </html>"""
+        file_contents = file.file.read()
 
-        # TODO fully implement
+        timestamp = datetime.strptime(data[:data.index('.')], self.date_format)
 
-        # Although this just counts the file length, it demonstrates
-        # how to read large files in chunks instead of all at once.
-        # CherryPy reads the uploaded file into a temporary file;
-        # myFile.file.read reads from that.
-        size = 0
-        while True:
-            dat = file.file.read(8192)
-            if not dat:
-                break
-            size += len(dat)
-        cherrypy.log.error(str(data))
-        return out % (size, file.filename, file.content_type)
+        print(timestamp)
+        
+        self.model.import_file(
+            HTMLFile.from_memory(file_contents, timestamp))
+
+        return
 
 
 class FolderBrowser(object):
@@ -260,7 +255,7 @@ if __name__ == '__main__':
 
     cherrypy.config.update("server.conf")
     cherrypy.tree.mount(None, '/', "server.conf")
-    cherrypy.tree.mount(Players(), '/api/players')
+    cherrypy.tree.mount(Players(model), '/api/players')
 
     Import = Import(model)
 

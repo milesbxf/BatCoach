@@ -7,7 +7,7 @@
  */
 
 (function(module) {
-	var ChooseDirCtrl = function($scope, $http, $window, ImportDirService) {
+	var ChooseDirCtrl = function($scope, $http, $window, GlobalsService) {
 
 		$scope.getBrowserDirectory = function() {
 			return $http.get('/api/folders/currentdir').then(function(result) {
@@ -49,14 +49,14 @@
 		$scope.directory = '';
 
 		$scope.init = function() {
-			ImportDirService.getImportDir().then(function(result) {
+			GlobalsService.getImportDir().then(function(result) {
 				$scope.directory = result.data.curDir;
 				// start in default directory
 				$scope.getFiles();
 			});
 		};
 	};
-	module.controller('ChooseDirCtrl', [ '$scope', '$http', '$window', 'ImportDirService',
+	module.controller('ChooseDirCtrl', [ '$scope', '$http', '$window', 'GlobalsService',
 			ChooseDirCtrl ]);
 
 })(angular.module('batcoachApp'));

@@ -48,7 +48,7 @@ def test_import_file_updates_db_with_players():
         html_file = HTMLFile.from_file(
             path.join(PROJECT_SOURCE_PATH, 'test', 'resources', 'squad.html'))
 
-        model.import_file(html_file, session)
+        model.import_file(html_file)
 
         # retrieve the team from the database
         # and check that it has imported correctly
@@ -105,27 +105,28 @@ class TestModel(TestCase):
         team = Team()
         mock_first.result = team
 
-        self.model.import_file(html_file, self.mock_session)
+        self.model.import_file(html_file)
         mock_parse_players.assert_called_with(html_file.HTML)
 
     @mock.patch('core.model.parse_pavilion')
     @mock.patch('sqlalchemy.orm.query.Query.first')
     @mock.patch('core.model.parse_team_id')
-    def test_import_file_calls_parse_pavilion_if_pavilion_file(self, mock_parse_team_id, mock_first, mock_parse_pavilion):
+    @mock.patch('core.PyBatBase.Team.add_ranking')
+    def test_import_file_calls_parse_pavilion_if_pavilion_file(self, mock_ranking,mock_parse_team_id, mock_first, mock_parse_pavilion):
         html_file = HTMLFile()
         html_file.type = PageTypes.Pavilion.value
         html_file.HTML = 'some HTML'
+        
 
         mock_parse_pavilion.return_value = []
         mock_parse_team_id.return_value = 3000
 
         team = Team()
+        team.rankings.append = mock.Mock()
 
         mock_first.result = team
+        self.model.import_file(html_file)
 
-        self.model.import_file(html_file, self.mock_session)
-
-        mock_parse_pavilion.assert_called_with(html_file.HTML)
         assert mock_parse_team_id.called
 
     @mock.patch('core.model.parse_team_id')
@@ -149,7 +150,7 @@ class TestModel(TestCase):
 
         mock_query.return_value.filter_by.return_value = mock_result
 
-        self.model.import_file(html_file, self.model.Session())
+        self.model.import_file(html_file)
 
         mock_query.assert_called_with(Team)
         assert mock_parse_team_id.called
