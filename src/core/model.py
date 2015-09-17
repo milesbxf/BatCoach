@@ -47,10 +47,7 @@ class Model():
                 html_files.append(self.import_file(file, session))
         return html_files
 
-    def import_file(self, file,session):
-
-        # read in the file
-        html_file = self.__read_file__(file)
+    def import_file(self, html_file,session):
 
         team = None
         
@@ -80,48 +77,6 @@ class Model():
 #                 raise BatDatabaseError() from err
         return html_file
 
-    def __read_file__(self, file, commit_to_db=True):
-
-        htmlFile = HTMLFile()
-
-        try:
-            # open the file and read into a PyQuery Document
-            f = open(file, 'r')
-            html = f.read()
-            doc = pq(html)
-
-            title_text = doc('title').text()
-
-            # check that this page has a title we can check
-
-            if not title_text:
-                raise BatParseException("Empty <title>")
-            elif not title_text.startswith('Battrick - '):
-                raise BatParseException(
-                    "<title>%s</title is not a valid Battrick title" %
-                    title_text)
-
-            # extract page information from title
-            pagetype = title_text.split(sep='Battrick - ')[1]
-
-            try:
-                htmlFile.type = page_types[pagetype].value
-            except KeyError:
-                raise BatParseException(
-                    "Page type '%s' not valid or not currently supported" % pagetype)
-
-            # add modified and imported time
-            htmlFile.date_modified = datetime.fromtimestamp(
-                os.path.getmtime(file))
-            htmlFile.date_imported = datetime.today()
-
-            # add HTML
-            htmlFile.HTML = html
-
-        finally:
-            f.close()
-
-        return htmlFile
 
     def has_teams(self):
         

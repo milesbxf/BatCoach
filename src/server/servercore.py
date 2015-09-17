@@ -13,9 +13,11 @@ import os
 import glob
 from core.model import Model
 from urllib.parse import unquote
+from core.PyBatBase import HTMLFile
 
 
 class Config(object):
+    """    The Config service (at /api/config/) allows the front end to check whether a database has been initialised.   """
 
     def __init__(self, model):
         self.model = model
@@ -26,9 +28,7 @@ class Config(object):
 
 
 class Players(object):
-    """
-    The Players service (at /api/players/) provides the squad.
-    """
+    """    The Players service (at /api/players/) provides access to the squad of players in the database.    """
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def index(self):
@@ -68,6 +68,7 @@ class Import(object):
 
     def __init__(self, model):
         # load the user's home directory by default
+        # TODO: check this works on Windows?
         self.import_dir = os.path.expanduser('~/')
         self.model = model
 
@@ -80,7 +81,8 @@ class Import(object):
             raise cherrypy.HTTPError(
                 500, 'Import directory ' +
                 self.import_dir +
-                ' is not valid')
+                ' is not valid'
+            )
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -102,6 +104,8 @@ class Import(object):
         is given.
         """
         self.__check_import_dir__()
+
+        # get all HTML files in the import directory
         files = glob.glob(self.import_dir + "*.html")
         return {'files': files}
 
@@ -109,12 +113,18 @@ class Import(object):
     @cherrypy.tools.json_out()
     @cherrypy.expose
     def importfiles(self):
-        """ Imports the files provided as a list in the request. """
-        files = (cherrypy.request.json)
+        """ Imports the files provided as a list of local filenames in the request. """
+        files = (cherrypy.request.json['files'])
 
-        output = self.model.import_multiple_files(files['files'])
+        html_files = []
+        for f in files:
+            # generate HTMLFile objects from the filenames
+            html_files.append(HTMLFile.from_file(f))
 
-        return output
+        self.model.import_multiple_files(html_files)
+
+        # TODO: add response with import success/failure
+        return "true"
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -141,6 +151,29 @@ class Import(object):
                 400, 'Selected folder %s does not exist' % folder)
 
         self.import_dir = folder
+
+    @cherrypy.expose
+    def upload(self, file, data):
+        out = """<html>
+        <body>
+            myFile length: %s<br />
+            myFile filename: %s<br />
+            myFile mime-type: %s
+        </body>
+        </html>"""
+
+        # Although this just counts the file length, it demonstrates
+        # how to read large files in chunks instead of all at once.
+        # CherryPy reads the uploaded file into a temporary file;
+        # myFile.file.read reads from that.
+        size = 0
+        while True:
+            dat = file.file.read(8192)
+            if not dat:
+                break
+            size += len(dat)
+        cherrypy.log.error(str(data))
+        return out % (size, file.filename, file.content_type)
 
 
 class FolderBrowser(object):

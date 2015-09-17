@@ -97,11 +97,13 @@ describe(
 			});
 
 			it('should change the import directory', function() {
-				
-				$httpBackend.expectPOST('/api/import/changedir',{newdir:currentdir}).respond(200);
-				
+
+				$httpBackend.expectPOST('/api/import/changedir', {
+					newdir : currentdir
+				}).respond(200);
+
 				scope.changeImportDir(currentdir);
 				$httpBackend.flush();
 			});
-			
+
 		});

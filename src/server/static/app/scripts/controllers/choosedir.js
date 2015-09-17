@@ -7,11 +7,7 @@
  */
 
 (function(module) {
-	var ChooseDirCtrl = function($scope, $http, $window) {
-
-		$scope.getImportDirectory = function() {
-			return $http.get('/api/import/dirname');
-		};
+	var ChooseDirCtrl = function($scope, $http, $window, ImportDirService) {
 
 		$scope.getBrowserDirectory = function() {
 			return $http.get('/api/folders/currentdir').then(function(result) {
@@ -30,7 +26,6 @@
 			if (folder) {
 				data.subdir = folder;
 			}
-			console.log(data);
 			$http.post('/api/folders/list', data).then(function(result) {
 				$scope.folders = result.data.folders;
 				$scope.directory = result.data.newdir;
@@ -38,7 +33,6 @@
 		};
 
 		$scope.changeImportDir = function(folder) {
-			console.log(folder);
 			return $http.post('/api/import/changedir', {
 				newdir : folder
 			});
@@ -55,18 +49,15 @@
 		$scope.directory = '';
 
 		$scope.init = function() {
-			console.log('Init');
-			$scope.getImportDirectory().then(function(result) {
+			ImportDirService.getImportDir().then(function(result) {
 				$scope.directory = result.data.curDir;
 				// start in default directory
 				$scope.getFiles();
 			});
 		};
 	};
-	module.controller('ChooseDirCtrl', [ '$scope', '$http', '$window',
+	module.controller('ChooseDirCtrl', [ '$scope', '$http', '$window', 'ImportDirService',
 			ChooseDirCtrl ]);
 
 })(angular.module('batcoachApp'));
 
-// angular.module('batcoachApp')
-// .controller('ChooseDirCtrl', );

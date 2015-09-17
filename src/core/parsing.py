@@ -2,7 +2,8 @@ import locale
 from pyquery import PyQuery as pq
 import re
 
-from core.PyBatBase import *
+from core.PyBatBase import Aggression, BasicSkills, ExtendedSkills, Fitness,\
+    Player, RankingSnapshot
 
 
 # import parsing
