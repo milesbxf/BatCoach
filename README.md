@@ -22,7 +22,7 @@ Total project test coverage: 88.8% (333/375).
 Using nosetest and nosetest-coverage.
 
 |Module|statements|missing|excluded|coverage|
-|-------------------------------------------|
+|------|----------|-------|--------|--------|
 |core.py|2|0|0|100%|
 |core/parsing.py|94|2|0|98%|
 |core/PyBatBase.py|160|7|0|96%|
@@ -35,7 +35,7 @@ Using nosetest and nosetest-coverage.
 Using Karma, Mocha, Chai and karma-coverage with Istanbul.
 
 |File|Statements|Branches|Functions|Lines|
-|----------------------------------------|
+|----|----------|--------|---------|-----|
 |scripts/app.module.js|100% (2/2)|100% (0/0)|100% (1/1)|100% (2/2)|
 |scripts/controllers/import.js|100% (28 / 28)|50% (3 / 6)|100% (9 / 9)|100% (28 / 28)|
 |scripts/controllers/main.js|16.67% (1 / 6)|0% (0 / 2)|0% (0 / 3)|16.67% (1 / 6)|
