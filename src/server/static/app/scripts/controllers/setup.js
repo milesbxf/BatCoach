@@ -9,18 +9,10 @@
 	        }
 	    });
 		
-		$scope.upload = function(file) {
-			if(file) {
-				Upload.upload({
-					url: '/api/import/upload',
-					file: file,
-					data: file.lastModifiedDate
-				});
-			}
-		};
+		$scope.upload = GlobalsService.upload;
 		
 	};
-	module.controller('SetupCtrl', [ '$scope','Upload',SetupCtrl ]);
+	module.controller('SetupCtrl', [ '$scope','GlobalsService',SetupCtrl ]);
 	
 	
 })(angular.module('batcoachApp'));

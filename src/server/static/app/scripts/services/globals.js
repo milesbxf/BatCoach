@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('batcoachApp').factory('GlobalsService',
-		[ '$http', function($http) {
+		[ '$http', 'Upload', function($http,Upload) {
 			
 			var svc = {};
 			
@@ -11,6 +11,16 @@ angular.module('batcoachApp').factory('GlobalsService',
 			
 			svc.getDBInit = function() {
 				return $http.get('/api/config/dbinit');
+			};
+			
+			svc.upload = function(file) {
+				if(file) {
+					Upload.upload({
+						url: '/api/import/upload',
+						file: file,
+						data: file.lastModifiedDate
+					});
+				}
 			};
 
 			return svc;
