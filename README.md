@@ -1,5 +1,12 @@
 #BatCoach
-BatCoach is a web app for managing a virtual online cricket team on [Battrick](http://www.battrick.org/), tracking stats and player attributes. Data is parsed from HTML files saved from the Battrick website and maintained in a database.
+A full stack web app for managing a virtual online cricket team on [Battrick.org](www.battrick.org), tracking stats
+and player attributes. Data is parsed from HTML files saved from the Battrick.org website and
+maintained in a database. The Python backend is powered by CherryPy, which imports HTML
+files uploaded from the frontend. PyQuery is used to retrieve relevant information from the
+HTML, and data is stored in a SQLite database with access mediated by SQLAlchemy. The
+frontend is powered by AngularJS. I first experimented with using Java EE/Spring for the
+backend was, and whilst it is an elegant and powerful framework I decided it was too
+heavyweight for my purposes.
 
 ##Release plan
 - v0.1 - imports players and club information from a selectable local directory or file upload. Tracks player attributes and highlights training 'pops' (attribute increases), records club information and tracks leagues and league positions.
