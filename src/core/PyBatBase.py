@@ -51,6 +51,11 @@ class Player(Base):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
+    def get_dict(self):
+        d = {}
+        for column in self.__table__.columns:
+            d[column.name] = str(getattr(self, column.name))
+        return d
 
 class RankingSnapshot(Base):
     __tablename__ = 'rankings'

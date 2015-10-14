@@ -4,12 +4,12 @@
     <table class="table table-striped"  style="border-collapse:collapse;">
     <tr><th>Name</th><th>Age</th><th>&nbsp;</th><th>&nbsp;</th><th>Bat Form</th><th>Bowl Form</th><th>Stam</th><th>Keep</th><th>Bat</th><th>Conc</th><th>Bowl</th><th>Cons</th><th>Field</th></tr>
                 <tr ng-repeat-start="player in players" data-toggle="collapse" data-target="#row{{$index}}" class="accordion-toggle" style="cursor: pointer">
-                <td>{{player.surName}}</td>
+                <td>{{player.name}}</td>
                 <td>{{player.age}}</td>
                 <td>{{player.batHand}}HB</td>
                 <td>{{player.bowlHand + player.bowlType}}</td>
-                <td>{{attrStrings[player.batForm]}}</td>
-                <td>{{attrStrings[player.bowlForm]}}</td>
+                <td>{{attrStrings[player.batform]}}</td>
+                <td>{{attrStrings[player.bowlform]}}</td>
                 <td>{{attrStrings[player.stamina]}}</td>
                 <td>{{attrStrings[player.keeping]}}</td>
                 <td>{{attrStrings[player.batting]}}</td>
@@ -24,18 +24,18 @@
                     
                     <div class="accordian-body collapse" id="row{{$index}}"> 
                         <div class="panel panel-default">
-                            <div class="panel-title">{{player.firstName}} {{player.surName}}, {{player.age}}yo, {{player.BTR}} BTR, £{{player.wage}} p/w</div>
-                            <div>A {{aggrStrings[player.batAggression]}} {{player.batHand}}HB and a {{aggrStrings[player.bowlAggression]}} {{player.bowlHand + player.bowlType}} bowler.</div>
+                            <div class="panel-title">{{player.name}}, {{player.age}}yo, {{player.BTR}} BTR, £{{player.wage}} p/w</div>
+                            <div>A {{aggrStrings[player.batAggression]}} {{player.bathand}}HB and a {{aggrStrings[player.aggressionbowl]}} {{player.bowlhand + player.bowltype}} bowler.</div>
                             <table class="table table-striped"  style="border-collapse:collapse;">
                                 <tr>
-                                    <td><b>Leadership:</b></td><td>Worthless</td>
-                                    <td><b>Experience:</b></td><td>Mediocre</td>
-                                    <td><b>Preference:</b></td><td>None</td>
-                                    <td><b>Trait:</b></td><td>None</td>
+                                    <td><b>Leadership:</b></td><td>{{attrStrings[player.leadership]}}</td>
+                                    <td><b>Experience:</b></td><td>{{attrStrings[player.experience]}}</td>
+                                    <!--<td><b>Preference:</b></td><td>None</td>
+                                    <td><b>Trait:</b></td><td>None</td>-->
                                 </tr>
                                 <tr>
-                                    <td><b>Batting form:</b></td><td>Strong</td>
-                                    <td><b>Bowling form:</b></td><td>Respectable</td>
+                                    <td><b>Batting form:</b></td><td>attrStrings[player.batform]</td>
+                                    <td><b>Bowling form:</b></td><td>attrStrings[player.bowlform]</td>
                                     <td></td><td></td>
                                     <td><b>Fitness:</b></td><td colspan="2">Lively</td>
                                 </tr>

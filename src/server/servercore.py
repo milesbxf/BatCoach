@@ -48,8 +48,11 @@ class Players(object):
         """
         Index (accessed at /api/players/). Currently a stub.
         """
-        
-        return model.get_players()
+        with model.session_scope() as session:
+            arr = [player.get_dict() for player in model.get_players(session)]
+            cherrypy.log.error(str(arr))
+            return arr
+            
         
         # TODO implement Players.index
 #         return [
